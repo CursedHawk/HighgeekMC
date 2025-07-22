@@ -1,0 +1,5 @@
+name: HighgeekSync
+version: "${paper.plugin.version}"
+main: eu.highgeek.paper.PaperMain
+api-version: '1.21'
+depend: [PlaceholderAPI, ProtocolLib, eco]

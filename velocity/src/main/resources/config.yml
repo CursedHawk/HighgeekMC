@@ -1,0 +1,16 @@
+#Velocity config
+
+proxy-name: ""
+
+redis:
+  host: ""
+  port: 6379
+
+rabbit:
+  host: ""
+  username: ""
+  password: ""
+
+debug: false
+# Do not touch this
+config-version: "${velocity.config.version}"

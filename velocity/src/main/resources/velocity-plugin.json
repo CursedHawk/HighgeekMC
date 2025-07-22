@@ -1,0 +1,6 @@
+{
+  "id": "highgeekproxy",
+  "name": "HighgeekProxy",
+  "version": "${velocity.plugin.version}",
+  "main": "eu.highgeek.velocity.VelocityMain"
+}

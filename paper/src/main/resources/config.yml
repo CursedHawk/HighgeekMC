@@ -1,0 +1,18 @@
+#Paper config
+
+# Use same name as in proxy
+server-name: ""
+pretty-server-name: ""
+
+redis:
+  host: ""
+  port: 6379
+
+rabbit:
+  host: ""
+  username: ""
+  password: ""
+
+debug: false
+# Do not touch this
+config-version: "${paper.config.version}"

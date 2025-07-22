@@ -1,0 +1,85 @@
+package eu.highgeek.velocity;
+
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import eu.highgeek.common.CommonMain;
+import eu.highgeek.common.abstraction.CommonLogger;
+import eu.highgeek.common.abstraction.CommonPlugin;
+import eu.highgeek.common.events.EventBus;
+import eu.highgeek.common.events.RedisEventBus;
+import eu.highgeek.common.rabbitmq.RabbitManager;
+import eu.highgeek.common.redis.RedisManager;
+import eu.highgeek.velocity.impl.VelocityLogger;
+import eu.highgeek.velocity.impl.VelocityEventBus;
+import eu.highgeek.velocity.listeners.RedisEventListener;
+import eu.highgeek.velocity.managers.EventManager;
+import lombok.Getter;
+import org.slf4j.Logger;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.nio.file.Path;
+
+public class VelocityMain implements CommonPlugin {
+//https://github.com/RagingTech/NetworkJoinMessages/blob/master/src/main/java/xyz/earthcow/networkjoinmessages/velocity/general/VelocityMain.java
+    @Getter
+    private final ProxyServer proxyServer;
+    @Getter
+    private static VelocityMain mainInstance;
+    @Getter
+    private static EventManager eventManager;
+
+    @Getter
+    private CommonMain commonMain;
+    @Override
+    public CommonMain getCommon() {
+        return commonMain;
+    }
+    private final VelocityLogger logger;
+    @Override
+    public CommonLogger getCommonLogger() {
+        return logger;
+    }
+    private static EventBus eventBus;
+    @Override
+    public EventBus getEventBus() {
+        return eventBus;
+    }
+    private static RedisEventBus redisEventBus;
+    @Override
+    public RedisEventBus getRedisEventBus() {
+        return redisEventBus;
+    }
+
+    private final File dataDirectory;
+    @Override
+    public File getDataFolder() {
+        return dataDirectory;
+    }
+
+    @Inject
+    public VelocityMain(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataDirectory) {
+        mainInstance = this;
+        this.logger = new VelocityLogger(logger);
+        this.proxyServer = proxyServer;
+        this.dataDirectory = dataDirectory.toFile();
+    }
+
+    @Subscribe
+    public void onInitialize(ProxyInitializeEvent event) {
+        eventBus = new VelocityEventBus(this);
+        redisEventBus = new RedisEventListener();
+        commonMain = new CommonMain(this);
+        eventManager = new EventManager(this);
+
+    }
+
+    @Subscribe
+    public void onShutdown(ProxyShutdownEvent event){
+        CommonMain.getRedisManager().stopListener();
+        CommonMain.getRabbitManager().stopListener();
+    }
+}
