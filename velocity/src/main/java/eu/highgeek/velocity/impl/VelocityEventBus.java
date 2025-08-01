@@ -22,15 +22,4 @@ public class VelocityEventBus implements EventBus {
     public void postRabbitEvent(RabbitEvent event) {
 
     }
-
-
-    public static String getKey(String channel) {
-        int index = channel.indexOf(':');
-
-        if (index >= 0 && index < channel.length() - 1) {
-            return channel.substring(0,index);
-        }
-        return channel;
-    }
-
 }

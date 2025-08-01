@@ -2,6 +2,7 @@ package eu.highgeek.velocity.managers;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import eu.highgeek.velocity.VelocityMain;
+import eu.highgeek.velocity.features.playersender.Sender;
 import eu.highgeek.velocity.listeners.ConnectionListener;
 
 public class EventManager {
@@ -14,6 +15,7 @@ public class EventManager {
     }
 
     private void registerEvents(){
-        main.getProxyServer().getEventManager().register(main, new ConnectionListener());
+        VelocityMain.getProxyServer().getEventManager().register(main, new ConnectionListener());
+        VelocityMain.getProxyServer().getEventManager().register(main, new Sender());
     }
 }

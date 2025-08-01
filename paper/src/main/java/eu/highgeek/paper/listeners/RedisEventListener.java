@@ -5,17 +5,19 @@ import eu.highgeek.common.abstraction.CommonPlayer;
 import eu.highgeek.common.events.RedisEvent;
 import eu.highgeek.common.events.RedisEventBus;
 import eu.highgeek.common.objects.ChatMessage;
-import eu.highgeek.common.objects.PlayerSettings;
+import eu.highgeek.common.objects.PlayerAuthSuccessEvent;
 import eu.highgeek.paper.PaperMain;
+import eu.highgeek.paper.events.AsyncRedisEconomyPayEvent;
 import eu.highgeek.paper.features.chat.ChatEvent;
+import eu.highgeek.paper.impl.PaperPlayer;
+import fr.xephi.authme.AuthMe;
+import fr.xephi.authme.api.v3.AuthMeApi;
 import org.bukkit.Bukkit;
 
 public class RedisEventListener implements RedisEventBus {
 
     public RedisEventListener(){
     }
-
-
 
     @Override
     public void postRedisEvent(RedisEvent event) {
@@ -31,6 +33,12 @@ public class RedisEventListener implements RedisEventBus {
             case "__keyevent@0__:expire":
                 //expire event
                 return;
+            case "velocitylogin":
+                if(PaperMain.isAuthme()){
+                    PlayerAuthSuccessEvent playerAuthSuccessEvent = CommonMain.getRedisManager().gson.fromJson(event.getMessage(), PlayerAuthSuccessEvent.class);
+                    PaperMain.getAuthMeListener().forcePlayerLogin(playerAuthSuccessEvent);
+                }
+                return;
             default:
                 //every other event
                 return;
@@ -38,7 +46,7 @@ public class RedisEventListener implements RedisEventBus {
     }
 
     public static void setEvent(String uuid){
-        String key = getKey(uuid);
+        String key = getRootKey(uuid);
         switch (key){
             case "chat":
                 if(!uuid.startsWith("chat:items")){
@@ -53,6 +61,14 @@ public class RedisEventListener implements RedisEventBus {
             case "players":
                 firePlayersEvent(uuid);
                 return;
+            case "economy":
+                if (uuid.contains("pay")){
+                    AsyncRedisEconomyPayEvent event = new AsyncRedisEconomyPayEvent(CommonMain.getRedisManager().getStringRedis(uuid), uuid, true);
+                    Bukkit.getPluginManager().callEvent(event);
+                }
+                //Main.logger.warning("Switch economy hit: " + message);
+                return;
+
 
             default:
                 return;
@@ -88,7 +104,7 @@ public class RedisEventListener implements RedisEventBus {
 
 
 
-    public static String getKey(String channel) {
+    public static String getRootKey(String channel) {
         int index = channel.indexOf(':');
 
         if (index >= 0 && index < channel.length() - 1) {

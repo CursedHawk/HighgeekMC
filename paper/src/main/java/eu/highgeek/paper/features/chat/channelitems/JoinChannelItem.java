@@ -1,5 +1,6 @@
 package eu.highgeek.paper.features.chat.channelitems;
 
+import eu.highgeek.common.abstraction.IChannelPlayer;
 import eu.highgeek.common.abstraction.CommonPlayer;
 import eu.highgeek.common.objects.ChatChannel;
 import lombok.Getter;
@@ -33,10 +34,10 @@ public class JoinChannelItem extends ItemStack implements ChannelItem {
     }
 
     public void onLeftClick(){
-        player.joinToChannel(channel);
+        ((IChannelPlayer) player).joinToChannel(channel);
     }
 
     public void onRightClick(){
-        player.setChannelOut(channel);
+        ((IChannelPlayer) player).setChannelOut(channel);
     }
 }

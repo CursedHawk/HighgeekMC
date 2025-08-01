@@ -1,13 +1,17 @@
 package eu.highgeek.paper.impl;
 
 import eu.highgeek.common.CommonMain;
+import eu.highgeek.common.abstraction.IChannelPlayer;
 import eu.highgeek.common.abstraction.CommonPlayer;
+import eu.highgeek.common.abstraction.IPlayerSettings;
 import eu.highgeek.common.objects.ChatChannel;
 import eu.highgeek.common.objects.PlayerSettings;
 import eu.highgeek.common.redis.RedisManager;
 import eu.highgeek.paper.PaperMain;
 import eu.highgeek.paper.features.chat.ChatEvent;
 import eu.highgeek.paper.features.chat.MessageBuilder;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,11 +22,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class PaperPlayer implements CommonPlayer, Listener {
+public class PaperPlayer implements CommonPlayer, IChannelPlayer, IPlayerSettings, Listener {
 
+    @Getter
     private final Player player;
     private final RedisManager redisManager = CommonMain.getRedisManager();
 
+    @Setter
+    @Getter
+    private boolean logged = false;
 
     public PaperPlayer(Player player){
         this.player = player;
@@ -58,7 +66,7 @@ public class PaperPlayer implements CommonPlayer, Listener {
     @Override
     public List<ChatChannel> getListeningChannels() {
         List<ChatChannel> channels = new ArrayList<>();
-        for (String s : getPlayerSettings().joinedChannels){
+        for (String s : getPlayerSettingsFromRedis().joinedChannels){
             channels.add(CommonMain.getChannelManager().getChatChannelFromName(s));
         }
         return channels;
@@ -66,7 +74,7 @@ public class PaperPlayer implements CommonPlayer, Listener {
 
     @Override
     public ChatChannel getChannelOut() {
-        return CommonMain.getChannelManager().getChatChannelFromName(getPlayerSettings().channelOut);
+        return CommonMain.getChannelManager().getChatChannelFromName(getPlayerSettingsFromRedis().channelOut);
     }
 
     @Override
@@ -77,11 +85,6 @@ public class PaperPlayer implements CommonPlayer, Listener {
     @Override
     public String getPlayerName() {
         return player.getName();
-    }
-
-    @Override
-    public PlayerSettings getPlayerSettings() {
-        return getPlayerSettingsFromRedis();
     }
 
     @Override
@@ -113,7 +116,6 @@ public class PaperPlayer implements CommonPlayer, Listener {
     public void onDisconnect(){
 
     }
-
 
 
 }

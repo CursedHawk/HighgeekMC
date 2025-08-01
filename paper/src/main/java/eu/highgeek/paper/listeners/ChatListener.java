@@ -2,6 +2,7 @@ package eu.highgeek.paper.listeners;
 
 import eu.highgeek.common.CommonMain;
 import eu.highgeek.common.abstraction.CommonPlayer;
+import eu.highgeek.common.abstraction.IChannelPlayer;
 import eu.highgeek.common.config.ConfigManager;
 import eu.highgeek.paper.PaperMain;
 import eu.highgeek.paper.adapters.ItemStackUtils;
@@ -34,7 +35,9 @@ public class ChatListener implements Listener {
 
     @EventHandler
     void onPlayerAsyncChatEvent(AsyncPlayerChatEvent event){
-        setRedisMessageAsync(event);
+        if(CommonMain.getCommonPlayer(event.getPlayer().getUniqueId()).isLogged() || !PaperMain.isAuthme()){
+            setRedisMessageAsync(event);
+        }
         event.setCancelled(true);
     }
 
@@ -45,7 +48,7 @@ public class ChatListener implements Listener {
                 String playerName = event.getPlayer().getName();
                 String time =  Instant.now().toString();
 
-                ChatChannel chatChannel = CommonMain.getCommonPlayer(event.getPlayer().getUniqueId()).getChannelOut();
+                ChatChannel chatChannel = ((IChannelPlayer) CommonMain.getCommonPlayer(event.getPlayer().getUniqueId())).getChannelOut();
 
                 String uuid = "chat:"+chatChannel.getName()+":"+time.replaceAll(":", "-")+":"+playerName;
                 String channelPrefix = chatChannel.getPrefix();

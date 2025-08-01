@@ -9,6 +9,8 @@ import lombok.Getter;
 import redis.clients.jedis.*;
 import redis.clients.jedis.json.Path2;
 
+import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.Set;
 
 public class RedisManager {
@@ -77,4 +79,37 @@ public class RedisManager {
         return unifiedJedis.jsonGet(uuid);
     }
 
+    public void sendMessage(String channel, String message){
+        jedisPooled.publish(channel, message);
+    }
+
+    public double getPlayerBalance(String playerName, String id){
+        return Double.parseDouble(getStringRedis("economy:players:"+playerName+":"+id));
+    }
+
+    public void setPlayerBalance(String playerName, String id, double toSet){
+        setStringRedis("economy:players:"+playerName+":"+id, String.valueOf(toSet));
+    }
+
+    public void depositPlayerBalance(String playerName, String id, double toDeposit){
+        setPlayerBalance(playerName, id, getPlayerBalance(playerName, id) + toDeposit);
+    }
+
+    public boolean hasPlayerBalance(String playerName, String id, double amount){
+        return (getPlayerBalance(playerName, id) - amount ) >= 0;
+    }
+
+    public boolean withdrawPlayerBalance(String playerName, String id, double toWithdraw){
+        double current = getPlayerBalance(playerName, id);
+        if(current >= 0){
+            setPlayerBalance(playerName, id, current - toWithdraw);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean playerExists(String playerName){
+        String ret = getStringRedis("players:settings:" + playerName);
+        return ret != null && !ret.trim().isEmpty();
+    }
 }

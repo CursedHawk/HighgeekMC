@@ -80,9 +80,7 @@ public class CommonMain {
     }
 
     public static void postRedisEvent(RedisEvent event) {
-        logger.debug("CommonMain: Redis message on channel: " + event.getChannel() + " with message: " + event.getMessage());
         if (redisEventBus != null) {
-            logger.debug("CommonMain posting: Redis message on channel: " + event.getChannel() + " with message: " + event.getMessage());
             redisEventBus.postRedisEvent(event);
         }
     }

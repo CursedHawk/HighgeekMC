@@ -1,6 +1,7 @@
 package eu.highgeek.paper.features.chat.channelitems;
 
 import eu.highgeek.common.abstraction.CommonPlayer;
+import eu.highgeek.common.abstraction.IChannelPlayer;
 import eu.highgeek.common.objects.ChatChannel;
 import lombok.Getter;
 import org.bukkit.Material;
@@ -33,10 +34,10 @@ public class LeaveChannelItem extends ItemStack implements ChannelItem {
     }
 
     public void onLeftClick(){
-        player.disconnectFromChannel(channel);
+         ((IChannelPlayer) player).disconnectFromChannel(channel);
     }
 
     public void onRightClick(){
-        player.setChannelOut(channel);
+        ((IChannelPlayer) player).setChannelOut(channel);
     }
 }

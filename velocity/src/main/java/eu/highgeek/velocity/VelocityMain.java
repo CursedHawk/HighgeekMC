@@ -1,5 +1,6 @@
 package eu.highgeek.velocity;
 
+import com.google.inject.Injector;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -10,11 +11,13 @@ import eu.highgeek.common.abstraction.CommonLogger;
 import eu.highgeek.common.abstraction.CommonPlugin;
 import eu.highgeek.common.events.EventBus;
 import eu.highgeek.common.events.RedisEventBus;
-import eu.highgeek.common.rabbitmq.RabbitManager;
-import eu.highgeek.common.redis.RedisManager;
+import eu.highgeek.velocity.listeners.Listener;
 import eu.highgeek.velocity.impl.VelocityLogger;
 import eu.highgeek.velocity.impl.VelocityEventBus;
 import eu.highgeek.velocity.listeners.RedisEventListener;
+import eu.highgeek.velocity.listeners.inputs.ChatListener;
+import eu.highgeek.velocity.listeners.inputs.CommandListener;
+import eu.highgeek.velocity.listeners.inputs.TabCompleteListener;
 import eu.highgeek.velocity.managers.EventManager;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -22,11 +25,12 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public class VelocityMain implements CommonPlugin {
 //https://github.com/RagingTech/NetworkJoinMessages/blob/master/src/main/java/xyz/earthcow/networkjoinmessages/velocity/general/VelocityMain.java
     @Getter
-    private final ProxyServer proxyServer;
+    private static ProxyServer proxyServer;
     @Getter
     private static VelocityMain mainInstance;
     @Getter
@@ -61,12 +65,14 @@ public class VelocityMain implements CommonPlugin {
     }
 
     @Inject
-    public VelocityMain(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityMain(ProxyServer proxy, Logger logger, @DataDirectory Path dataDirectory) {
         mainInstance = this;
         this.logger = new VelocityLogger(logger);
-        this.proxyServer = proxyServer;
+        proxyServer = proxy;
         this.dataDirectory = dataDirectory.toFile();
     }
+    @Inject
+    private Injector injector;
 
     @Subscribe
     public void onInitialize(ProxyInitializeEvent event) {
@@ -74,6 +80,14 @@ public class VelocityMain implements CommonPlugin {
         redisEventBus = new RedisEventListener();
         commonMain = new CommonMain(this);
         eventManager = new EventManager(this);
+
+
+        Stream.of(
+                        ChatListener.class,
+                        CommandListener.class,
+                        TabCompleteListener.class
+                ).map(injector::getInstance)
+                .forEach(Listener::register);
 
     }
 

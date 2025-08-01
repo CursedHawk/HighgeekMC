@@ -11,6 +11,22 @@ rabbit:
   username: ""
   password: ""
 
+auth-servers:
+  - "auth"
+
+#Do not save as last server, and used as auth servers.
+forced-servers:
+  - "modded"
+
+allowed-commands:
+  - "login"
+  - "l"
+  - "reg"
+  - "register"
+  - "reg"
+  - "email"
+  - "captcha"
+
 debug: false
 # Do not touch this
 config-version: "${velocity.config.version}"

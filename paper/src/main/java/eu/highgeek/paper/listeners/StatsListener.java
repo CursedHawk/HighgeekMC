@@ -30,6 +30,7 @@ public class StatsListener implements Listener {
     }
 
     private void runAsync(PlayerStatisticIncrementEvent event){
+        redisManager.sendMessage("testingchannel", "testingmessage");
         try {
             switch (event.getStatistic().getType()){
                 case BLOCK, ITEM:{

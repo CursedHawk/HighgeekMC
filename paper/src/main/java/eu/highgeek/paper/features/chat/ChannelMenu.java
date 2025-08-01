@@ -2,6 +2,8 @@ package eu.highgeek.paper.features.chat;
 
 import eu.highgeek.common.CommonMain;
 import eu.highgeek.common.abstraction.CommonPlayer;
+import eu.highgeek.common.abstraction.IChannelPlayer;
+import eu.highgeek.common.abstraction.IPlayerSettings;
 import eu.highgeek.common.objects.ChatChannel;
 import eu.highgeek.paper.PaperMain;
 import eu.highgeek.paper.features.chat.channelitems.*;
@@ -46,10 +48,10 @@ public class ChannelMenu implements InventoryHolder, Listener {
     }
 
     private ChannelItem generateItemStack(ChatChannel chatChannel){
-        if(Objects.equals(player.getChannelOut(), chatChannel)){
+        if(Objects.equals(((IChannelPlayer) player).getChannelOut(), chatChannel)){
             return new OutChannelItem(chatChannel, player);
         }else
-        if(player.getListeningChannels().contains(chatChannel)){
+        if(((IChannelPlayer) player).getListeningChannels().contains(chatChannel)){
             return new LeaveChannelItem(chatChannel, player);
         }else {
             return new JoinChannelItem(chatChannel, player);
@@ -57,7 +59,7 @@ public class ChannelMenu implements InventoryHolder, Listener {
     }
 
     private ItemStack getDiscordChannelItem(){
-        if(player.getPlayerSettingsFromRedis().hasConnectedDiscord){
+        if(((IPlayerSettings) player).getPlayerSettingsFromRedis().hasConnectedDiscord){
             ItemStack itemStack = new ItemStack(Material.BLUE_WOOL);
             ItemMeta meta = itemStack.getItemMeta();
             meta.setDisplayName("Discord");
