@@ -1,10 +1,13 @@
 package eu.highgeek.paper.features.economy;
 
 import eu.highgeek.common.CommonMain;
+import eu.highgeek.common.objects.RedisEconomyResponse;
 import eu.highgeek.common.redis.RedisManager;
 import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
+
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
@@ -117,98 +120,98 @@ public class VaultEconomyImpl implements Economy {
     }
 
     @Override
-    public EconomyResponse withdrawPlayer(String s, double v) {
-        return null;
+    public EconomyResponse withdrawPlayer(String playerName, double v) {
+        return redisToEconomyResponse(redisManager.withdrawPlayerBalance(playerName, currency.getId(), v));
     }
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, double v) {
-        return null;
+        return withdrawPlayer(offlinePlayer.getName(), v);
     }
 
     @Override
-    public EconomyResponse withdrawPlayer(String s, String s1, double v) {
-        return null;
+    public EconomyResponse withdrawPlayer(String playerName, String s1, double v) {
+        return redisToEconomyResponse(redisManager.withdrawPlayerBalance(playerName, currency.getId(), v));
     }
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, String s, double v) {
-        return null;
+        return withdrawPlayer(offlinePlayer.getName(), v);
     }
 
     @Override
-    public EconomyResponse depositPlayer(String s, double v) {
-        return null;
+    public EconomyResponse depositPlayer(String playerName, double v) {
+        return redisToEconomyResponse(redisManager.depositPlayerBalance(playerName, currency.getId(), v));
     }
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer offlinePlayer, double v) {
-        return null;
+        return depositPlayer(offlinePlayer.getName(), v);
     }
 
     @Override
-    public EconomyResponse depositPlayer(String s, String s1, double v) {
-        return null;
+    public EconomyResponse depositPlayer(String playerName, String s1, double v) {
+        return depositPlayer(playerName, v);
     }
 
     @Override
     public EconomyResponse depositPlayer(OfflinePlayer offlinePlayer, String s, double v) {
-        return null;
+        return depositPlayer(offlinePlayer.getName(), v);
     }
 
     @Override
     public EconomyResponse createBank(String s, String s1) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse createBank(String s, OfflinePlayer offlinePlayer) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse deleteBank(String s) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse bankBalance(String s) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse bankHas(String s, double v) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse bankWithdraw(String s, double v) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse bankDeposit(String s, double v) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse isBankOwner(String s, String s1) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse isBankOwner(String s, OfflinePlayer offlinePlayer) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse isBankMember(String s, String s1) {
-        return null;
+        return notImplemented();
     }
 
     @Override
     public EconomyResponse isBankMember(String s, OfflinePlayer offlinePlayer) {
-        return null;
+        return notImplemented();
     }
 
     @Override
@@ -216,6 +219,7 @@ public class VaultEconomyImpl implements Economy {
         return List.of();
     }
 
+    //TODO What with this?
     @Override
     public boolean createPlayerAccount(String s) {
         return false;
@@ -234,5 +238,17 @@ public class VaultEconomyImpl implements Economy {
     @Override
     public boolean createPlayerAccount(OfflinePlayer offlinePlayer, String s) {
         return false;
+    }
+
+    public static EconomyResponse redisToEconomyResponse(RedisEconomyResponse redisEconomyResponse){
+        if (redisEconomyResponse.success()) {
+            return new EconomyResponse(redisEconomyResponse.ammount(), redisEconomyResponse.balance(), ResponseType.SUCCESS, null);
+        }else{
+            return new EconomyResponse(redisEconomyResponse.ammount(), redisEconomyResponse.balance(), ResponseType.FAILURE, "Insufficient funds");
+        }
+    }
+
+    public static EconomyResponse notImplemented(){
+        return new EconomyResponse(0, 0, ResponseType.NOT_IMPLEMENTED, null);
     }
 }

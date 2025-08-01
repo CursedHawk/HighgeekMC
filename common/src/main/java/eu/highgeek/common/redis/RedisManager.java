@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.highgeek.common.CommonMain;
 import eu.highgeek.common.objects.ChatMessage;
+import eu.highgeek.common.objects.RedisEconomyResponse;
 import eu.highgeek.common.objects.config.RedisConfig;
 import lombok.Getter;
 import redis.clients.jedis.*;
@@ -91,21 +92,23 @@ public class RedisManager {
         setStringRedis("economy:players:"+playerName+":"+id, String.valueOf(toSet));
     }
 
-    public void depositPlayerBalance(String playerName, String id, double toDeposit){
-        setPlayerBalance(playerName, id, getPlayerBalance(playerName, id) + toDeposit);
+    public RedisEconomyResponse depositPlayerBalance(String playerName, String id, double toDeposit){
+        double current = getPlayerBalance(playerName, id);
+        setPlayerBalance(playerName, id, current + toDeposit);
+        return new RedisEconomyResponse(true, current + toDeposit, toDeposit);
     }
 
     public boolean hasPlayerBalance(String playerName, String id, double amount){
         return (getPlayerBalance(playerName, id) - amount ) >= 0;
     }
 
-    public boolean withdrawPlayerBalance(String playerName, String id, double toWithdraw){
+    public RedisEconomyResponse withdrawPlayerBalance(String playerName, String id, double toWithdraw){
         double current = getPlayerBalance(playerName, id);
         if(current >= 0){
             setPlayerBalance(playerName, id, current - toWithdraw);
-            return true;
+            return new RedisEconomyResponse(true, current - toWithdraw, toWithdraw);
         }
-        return false;
+        return new RedisEconomyResponse(false, current, toWithdraw);
     }
 
     public boolean playerExists(String playerName){
