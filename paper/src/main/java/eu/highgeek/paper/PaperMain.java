@@ -5,10 +5,13 @@ import com.comphenix.protocol.ProtocolManager;
 import eu.highgeek.common.CommonMain;
 import eu.highgeek.common.abstraction.CommonLogger;
 import eu.highgeek.common.abstraction.CommonPlugin;
+import eu.highgeek.common.economy.Currencies;
 import eu.highgeek.common.events.EventBus;
 import eu.highgeek.common.events.RedisEventBus;
+import eu.highgeek.paper.commands.DebugCommand;
 import eu.highgeek.paper.features.chat.ChannelCommand;
 import eu.highgeek.paper.features.chat.ChannelMenu;
+import eu.highgeek.paper.features.economy.VaultEconomyImpl;
 import eu.highgeek.paper.impl.PaperLogger;
 import eu.highgeek.paper.impl.PaperEventBus;
 import eu.highgeek.paper.integration.authme.AuthMeListener;
@@ -19,7 +22,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -46,6 +51,10 @@ public class PaperMain extends JavaPlugin implements CommonPlugin {
     private static Economy economy = null;
     @Getter
     private static Chat chat = null;
+    @Getter
+    private static Plugin vaultPlugin = null;
+    @Getter
+    private static VaultEconomyImpl vaultEconomy;
 
 
     @Override
@@ -63,6 +72,7 @@ public class PaperMain extends JavaPlugin implements CommonPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
         eventManager = new EventManager(this);
 
+        setupEconomy();
         registerCommands();
     }
 
@@ -75,6 +85,7 @@ public class PaperMain extends JavaPlugin implements CommonPlugin {
     private void registerCommands(){
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(ChannelCommand.createCommand().build());
+            commands.registrar().register(DebugCommand.createCommand().build());
         });
     }
 
@@ -106,24 +117,28 @@ public class PaperMain extends JavaPlugin implements CommonPlugin {
         return dataDirectory;
     }
 
-    //TODO chat
-    private boolean setupChat(){
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        chat = rsp.getProvider();
-        return chat != null;
-    }
 
     //TODO economy
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
+
+        vaultPlugin = getServer().getPluginManager().getPlugin("Vault");
+
+        vaultEconomy = new VaultEconomyImpl(CommonMain.getCurrencies().getVaultCurrency());
+
+        this.getServer().getServicesManager().register(Economy.class, vaultEconomy, vaultPlugin, ServicePriority.High);
+
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }
+        if(rsp.getProvider() == null){
+            return false;
+        }
         economy = rsp.getProvider();
-        return economy != null;
+        return true;
     }
 
 

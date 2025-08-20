@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import eu.highgeek.common.CommonMain;
 import eu.highgeek.common.abstraction.CommonPlayer;
 import eu.highgeek.common.abstraction.IPlayerSettings;
+import eu.highgeek.common.economy.Currency;
 import eu.highgeek.common.objects.ChatChannel;
 import eu.highgeek.common.objects.PlayerSettings;
 import eu.highgeek.common.redis.RedisManager;
@@ -20,6 +21,7 @@ public class VelocityPlayer implements CommonPlayer, IPlayerSettings {
 
     public VelocityPlayer(Player player){
         this.player = player;
+        createEconomy();
     }
 
     @Setter
@@ -62,5 +64,13 @@ public class VelocityPlayer implements CommonPlayer, IPlayerSettings {
 
     public String getLastServer(){
         return getPlayerSettingsFromRedis().lastServer;
+    }
+
+    public void createEconomy(){
+        for (Currency currency : CommonMain.getCurrencies().getCurrencies().values()){
+            if(!currency.accountExists("players:" + player.getUsername())){
+                currency.setAccountCurrency("players:" + player.getUsername(), Double.parseDouble(currency.getDefaultValue()));
+            }
+        }
     }
 }

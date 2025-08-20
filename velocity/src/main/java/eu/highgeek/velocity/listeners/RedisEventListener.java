@@ -10,7 +10,7 @@ public class RedisEventListener implements RedisEventBus {
 
     @Override
     public void postRedisEvent(RedisEvent event) {
-        CommonMain.getLogger().info("VelocityEventBus: Redis message on channel: " + event.getChannel() + " with message: " + event.getMessage());
+        CommonMain.getLogger().debug("VelocityEventBus: Redis message on channel: " + event.getChannel() + " with message: " + event.getMessage());
         switch (event.getChannel()){
             case "__keyevent@0__:set":
                 //set event

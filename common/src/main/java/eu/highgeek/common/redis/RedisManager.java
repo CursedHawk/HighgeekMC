@@ -10,8 +10,6 @@ import lombok.Getter;
 import redis.clients.jedis.*;
 import redis.clients.jedis.json.Path2;
 
-import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.Set;
 
 public class RedisManager {
@@ -84,35 +82,36 @@ public class RedisManager {
         jedisPooled.publish(channel, message);
     }
 
-    public double getPlayerBalance(String playerName, String id){
-        return Double.parseDouble(getStringRedis("economy:players:"+playerName+":"+id));
+
+    public double getAccountBalance(String account, String id){
+        return Double.parseDouble(getStringRedis("economy:accounts:"+account+":"+id));
     }
 
-    public void setPlayerBalance(String playerName, String id, double toSet){
-        setStringRedis("economy:players:"+playerName+":"+id, String.valueOf(toSet));
+    public void setAccountBalance(String account, String id, double toSet){
+        setStringRedis("economy:accounts:"+account+":"+id, String.valueOf(toSet));
     }
 
-    public RedisEconomyResponse depositPlayerBalance(String playerName, String id, double toDeposit){
-        double current = getPlayerBalance(playerName, id);
-        setPlayerBalance(playerName, id, current + toDeposit);
+    public RedisEconomyResponse depositAccountBalance(String account, String id, double toDeposit){
+        double current = getAccountBalance(account, id);
+        setAccountBalance(account, id, current + toDeposit);
         return new RedisEconomyResponse(true, current + toDeposit, toDeposit);
     }
 
-    public boolean hasPlayerBalance(String playerName, String id, double amount){
-        return (getPlayerBalance(playerName, id) - amount ) >= 0;
+    public boolean hasAccountBalance(String account, String id, double amount){
+        return (getAccountBalance(account, id) - amount ) >= 0;
     }
 
-    public RedisEconomyResponse withdrawPlayerBalance(String playerName, String id, double toWithdraw){
-        double current = getPlayerBalance(playerName, id);
+    public RedisEconomyResponse withdrawAccountBalance(String account, String id, double toWithdraw){
+        double current = getAccountBalance(account, id);
         if(current >= 0){
-            setPlayerBalance(playerName, id, current - toWithdraw);
+            setAccountBalance(account, id, current - toWithdraw);
             return new RedisEconomyResponse(true, current - toWithdraw, toWithdraw);
         }
         return new RedisEconomyResponse(false, current, toWithdraw);
     }
 
-    public boolean playerExists(String playerName){
-        String ret = getStringRedis("players:settings:" + playerName);
+    public boolean accountExists(String account, String currency){
+        String ret =  getStringRedis("economy:accounts:" + account +":" + currency);
         return ret != null && !ret.trim().isEmpty();
     }
 }

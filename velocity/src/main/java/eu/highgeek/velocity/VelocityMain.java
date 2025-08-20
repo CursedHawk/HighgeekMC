@@ -1,6 +1,10 @@
 package eu.highgeek.velocity;
 
 import com.google.inject.Injector;
+import com.velocitypowered.api.command.BrigadierCommand;
+import com.velocitypowered.api.command.Command;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -11,6 +15,7 @@ import eu.highgeek.common.abstraction.CommonLogger;
 import eu.highgeek.common.abstraction.CommonPlugin;
 import eu.highgeek.common.events.EventBus;
 import eu.highgeek.common.events.RedisEventBus;
+import eu.highgeek.velocity.commands.DebugCommand;
 import eu.highgeek.velocity.listeners.Listener;
 import eu.highgeek.velocity.impl.VelocityLogger;
 import eu.highgeek.velocity.impl.VelocityEventBus;
@@ -88,7 +93,18 @@ public class VelocityMain implements CommonPlugin {
                         TabCompleteListener.class
                 ).map(injector::getInstance)
                 .forEach(Listener::register);
+        registerCommands();
+    }
 
+    private void registerCommands(){
+        CommandManager commandManager = proxyServer.getCommandManager();
+
+        CommandMeta commandMeta = commandManager.metaBuilder("velocitydebug")
+                .plugin(this)
+                .build();
+        Command debugCommand = new DebugCommand();
+
+        commandManager.register(commandMeta, debugCommand);
     }
 
     @Subscribe

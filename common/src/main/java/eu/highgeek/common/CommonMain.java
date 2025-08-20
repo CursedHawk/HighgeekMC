@@ -5,6 +5,7 @@ import eu.highgeek.common.abstraction.CommonPlayer;
 import eu.highgeek.common.abstraction.CommonPlugin;
 import eu.highgeek.common.chat.ChannelManager;
 import eu.highgeek.common.config.ConfigManager;
+import eu.highgeek.common.economy.Currencies;
 import eu.highgeek.common.events.EventBus;
 import eu.highgeek.common.events.RabbitEvent;
 import eu.highgeek.common.events.RedisEvent;
@@ -43,6 +44,8 @@ public class CommonMain {
     @Getter
     private static final List<CommonPlayer> commonPlayers = new ArrayList<>();
 
+    @Getter
+    private static Currencies currencies;
 
 
     public CommonMain(CommonPlugin plugin){
@@ -55,9 +58,9 @@ public class CommonMain {
         redisManager = new RedisManager(this);
         rabbitManager = new RabbitManager(this);
 
-
-
         channelManager = new ChannelManager(redisManager);
+        currencies = new Currencies();
+
     }
 
 

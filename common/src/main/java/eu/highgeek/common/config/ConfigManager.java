@@ -41,4 +41,12 @@ public class ConfigManager {
     public static YamlDocument getPluginConfig() {
         return config;
     }
+
+    public static void toggleDebug(){
+        if(getPluginConfig().getBoolean("debug")){
+            config.set("debug", false);
+        }else {
+            config.set("debug", true);
+        }
+    }
 }

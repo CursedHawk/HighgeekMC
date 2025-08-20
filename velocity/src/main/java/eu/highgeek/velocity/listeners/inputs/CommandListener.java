@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.EventTask;
 import com.velocitypowered.api.event.PostOrder;
-import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,6 +52,7 @@ public class CommandListener implements Listener<CommandExecuteEvent> {
                 }
             }
             CommonMain.getLogger().debug("ALLOWED");
+
             continuation.resume();
         });
     }

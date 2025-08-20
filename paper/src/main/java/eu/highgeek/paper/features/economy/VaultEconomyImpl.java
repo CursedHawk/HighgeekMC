@@ -1,9 +1,7 @@
 package eu.highgeek.paper.features.economy;
 
-import eu.highgeek.common.CommonMain;
+import eu.highgeek.common.economy.Currency;
 import eu.highgeek.common.objects.RedisEconomyResponse;
-import eu.highgeek.common.redis.RedisManager;
-import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
@@ -14,15 +12,11 @@ import java.util.List;
 
 public class VaultEconomyImpl implements Economy {
 
-    @Getter
     private final Currency currency;
-
-    private final RedisManager redisManager = CommonMain.getRedisManager();
 
     public VaultEconomyImpl(Currency currency){
         this.currency = currency;
     }
-
 
     @Override
     public boolean isEnabled() {
@@ -61,7 +55,28 @@ public class VaultEconomyImpl implements Economy {
 
     @Override
     public boolean hasAccount(String s) {
-        return redisManager.playerExists(s);
+        return currency.accountExists("players:"+s);
+    }
+
+    @Override
+    public double getBalance(String playerName) {
+        return currency.getAccountCurrency("players:"+playerName);
+    }
+
+    @Override
+    public boolean has(String playerName, double v) {
+        return currency.accountHas("players:"+playerName, v);
+    }
+
+    @Override
+    public EconomyResponse withdrawPlayer(String playerName, double v) {
+        return redisToEconomyResponse(currency.withdrawAccount("players:"+playerName, v));
+    }
+
+    @Override
+    public EconomyResponse depositPlayer(String playerName, double v) {
+
+        return  redisToEconomyResponse(currency.depositAccount("players:" + playerName, v));
     }
 
     @Override
@@ -71,17 +86,12 @@ public class VaultEconomyImpl implements Economy {
 
     @Override
     public boolean hasAccount(String s, String s1) {
-        return redisManager.playerExists(s);
+        return hasAccount(s);
     }
 
     @Override
     public boolean hasAccount(OfflinePlayer offlinePlayer, String s) {
         return hasAccount(offlinePlayer.getName());
-    }
-
-    @Override
-    public double getBalance(String playerName) {
-        return redisManager.getPlayerBalance(playerName, currency.getId());
     }
 
     @Override
@@ -91,17 +101,12 @@ public class VaultEconomyImpl implements Economy {
 
     @Override
     public double getBalance(String playerName, String s1) {
-        return redisManager.getPlayerBalance(playerName, currency.getId());
+        return getBalance(playerName);
     }
 
     @Override
     public double getBalance(OfflinePlayer offlinePlayer, String s) {
         return getBalance(offlinePlayer.getName());
-    }
-
-    @Override
-    public boolean has(String playerName, double v) {
-        return redisManager.hasPlayerBalance(playerName, currency.getId(), v);
     }
 
     @Override
@@ -111,17 +116,12 @@ public class VaultEconomyImpl implements Economy {
 
     @Override
     public boolean has(String playerName, String s1, double v) {
-        return redisManager.hasPlayerBalance(playerName, currency.getId(), v);
+        return has(playerName, v);
     }
 
     @Override
     public boolean has(OfflinePlayer offlinePlayer, String s, double v) {
         return has(offlinePlayer.getName(), v);
-    }
-
-    @Override
-    public EconomyResponse withdrawPlayer(String playerName, double v) {
-        return redisToEconomyResponse(redisManager.withdrawPlayerBalance(playerName, currency.getId(), v));
     }
 
     @Override
@@ -131,17 +131,12 @@ public class VaultEconomyImpl implements Economy {
 
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String s1, double v) {
-        return redisToEconomyResponse(redisManager.withdrawPlayerBalance(playerName, currency.getId(), v));
+        return withdrawPlayer(playerName, v);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(OfflinePlayer offlinePlayer, String s, double v) {
         return withdrawPlayer(offlinePlayer.getName(), v);
-    }
-
-    @Override
-    public EconomyResponse depositPlayer(String playerName, double v) {
-        return redisToEconomyResponse(redisManager.depositPlayerBalance(playerName, currency.getId(), v));
     }
 
     @Override
