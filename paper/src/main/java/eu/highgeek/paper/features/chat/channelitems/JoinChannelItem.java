@@ -3,6 +3,7 @@ package eu.highgeek.paper.features.chat.channelitems;
 import eu.highgeek.common.abstraction.IChannelPlayer;
 import eu.highgeek.common.abstraction.CommonPlayer;
 import eu.highgeek.common.objects.ChatChannel;
+import eu.highgeek.paper.impl.PaperPlayer;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -38,6 +39,13 @@ public class JoinChannelItem extends ItemStack implements ChannelItem {
     }
 
     public void onRightClick(){
-        ((IChannelPlayer) player).setChannelOut(channel);
+        if(player.checkPermission(channel.speakPermission)){
+            ((IChannelPlayer) player).setChannelOut(channel);
+            if (!((IChannelPlayer) player).getListeningChannels().contains(channel)){
+                ((IChannelPlayer) player).joinToChannel(channel);
+            }
+        }else {
+            ((PaperPlayer) player).getPlayer().sendMessage("You cannot talk in this channel.");
+        }
     }
 }

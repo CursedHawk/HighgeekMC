@@ -19,7 +19,7 @@ public class AuthMeListener implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onLogin(final LoginEvent event) {
         final Player player = event.getPlayer();
         CommonMain.getCommonPlayer(event.getPlayer().getUniqueId()).setLogged(true);
@@ -32,9 +32,11 @@ public class AuthMeListener implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onRegister(final RegisterEvent event) {
-
+        final Player player = event.getPlayer();
+        CommonMain.getCommonPlayer(event.getPlayer().getUniqueId()).setLogged(true);
+        redisManager.sendMessage("playerloggedevent", redisManager.gson.toJson(new PlayerAuthSuccessEvent(player.getUniqueId(), player.getName())));
     }
 
     @EventHandler

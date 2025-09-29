@@ -56,6 +56,13 @@ public class VelocityPlayer implements CommonPlayer, IPlayerSettings {
         }
     }
 
+    public boolean checkPermission(String perm){
+        if (perm == null){
+            return true;
+        }
+        return player.hasPermission(perm);
+    }
+
     public void setLastServer(String lastServer){
         PlayerSettings settings = getPlayerSettingsFromRedis();
         settings.lastServer = lastServer;

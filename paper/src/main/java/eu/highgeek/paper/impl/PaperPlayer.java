@@ -50,6 +50,13 @@ public class PaperPlayer implements CommonPlayer, IChannelPlayer, IPlayerSetting
     }
 
 
+    public boolean checkPermission(String perm){
+        if (perm == null){
+            return true;
+        }
+        return player.hasPermission(perm);
+    }
+
 
     public PlayerSettings getPlayerSettingsFromRedis(){
         String playerSettings = redisManager.getStringRedis("players:settings:"+player.getName());

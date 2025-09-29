@@ -8,4 +8,5 @@ public interface CommonPlayer {
     String getPlayerName();
     boolean isLogged();
     void setLogged(boolean logged);
+    boolean checkPermission(String perm);
 }

@@ -7,6 +7,7 @@ import eu.highgeek.common.abstraction.IPlayerSettings;
 import eu.highgeek.common.objects.ChatChannel;
 import eu.highgeek.paper.PaperMain;
 import eu.highgeek.paper.features.chat.channelitems.*;
+import eu.highgeek.paper.impl.PaperPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -41,9 +42,11 @@ public class ChannelMenu implements InventoryHolder, Listener {
         items.clear();
         inventory.addItem(getInfoItem());
         for(ChatChannel channel : CommonMain.getChannelManager().getChatChannels()){
-            ChannelItem i = generateItemStack(channel);
-            items.put(channel.getName(), i);
-            inventory.addItem(i.getItemStack());
+            if(player.checkPermission(channel.permission)){
+                ChannelItem i = generateItemStack(channel);
+                items.put(channel.getName(), i);
+                inventory.addItem(i.getItemStack());
+            }
         }
     }
 

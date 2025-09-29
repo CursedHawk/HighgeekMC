@@ -38,6 +38,8 @@ public class LeaveChannelItem extends ItemStack implements ChannelItem {
     }
 
     public void onRightClick(){
-        ((IChannelPlayer) player).setChannelOut(channel);
+        if(player.checkPermission(channel.speakPermission)){
+            ((IChannelPlayer) player).setChannelOut(channel);
+        }
     }
 }
