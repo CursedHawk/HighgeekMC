@@ -55,6 +55,9 @@ public class AuthMeListener implements Listener {
     }
 
     public void forcePlayerLogin(PlayerAuthSuccessEvent event){
-        AuthMeApi.getInstance().forceLogin(Bukkit.getPlayer(event.getPlayerUuid()));
+        Player player = Bukkit.getPlayer(event.getPlayerUuid());
+        if(player != null) {
+            AuthMeApi.getInstance().forceLogin(player);
+        }
     }
 }

@@ -60,11 +60,6 @@
       <version>4.21.0</version>
     </dependency>
     <dependency>
-      <groupId>io.appwrite</groupId>
-      <artifactId>sdk-for-kotlin</artifactId>
-      <version>9.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>net.kyori</groupId>
       <artifactId>adventure-text-serializer-gson</artifactId>
       <version>4.22.0</version>
